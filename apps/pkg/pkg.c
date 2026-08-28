@@ -18,6 +18,13 @@ extern int  kstrncmp(const char*,const char*,u32);
 extern void kmemset(void*,u8,u32);
 extern void kmemcpy(void*,const void*,u32);
 extern char *kstrchr(const char*,int);
+extern void ksnprintf(char*,u32,const char*,...);
+/* declaradas aqui para evitar implicit declaration */
+static void kstrcat_local(char* dst, const char* src){
+    int n = kstrlen(dst);
+    kstrcpy(dst + n, src);
+}
+#define kstrcat kstrcat_local
 extern int  kvsprintf(char*,const char*,__builtin_va_list);
 extern void ksnprintf(char*,u32,const char*,...);
 
@@ -502,8 +509,4 @@ int pkg_repo_list(repo_t *out, int max){
 
 void pkg_set_progress_cb(pkg_progress_cb_t cb){ progress_cb=cb; }
 
-/* Alias ausente no kernel — helper simples */
-void kstrcat(char *dst, const char *src){
-    int n=kstrlen(dst);
-    kstrcpy(dst+n,src);
-}
+/* kstrcat definido no topo via macro */

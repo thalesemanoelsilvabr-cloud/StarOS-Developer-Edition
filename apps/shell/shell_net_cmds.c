@@ -43,6 +43,15 @@ extern int  deb_install(const char *path);
 extern void deb_installer_app_main(void);
 extern u32  timer_ticks;
 
+/* ── Helper de busca de caractere ────────────────────────────── */
+static char* kstrchr(const char* s, int c) {
+    while (*s) {
+        if (*s == (char)c) return (char*)s;
+        s++;
+    }
+    return (c == 0) ? (char*)s : 0;
+}
+
 /* ── Callback de progresso para o shell ──────────────────────── */
 static void shell_pkg_progress(const char *pkg, int pct){
     kprintf("\r[pkg] %-32s [", pkg);
@@ -84,10 +93,27 @@ static int cmd_ping(int argc, char **argv){
     if(argv[1][0]>='0'&&argv[1][0]<='9'){
         /* IP literal */
         int a=0,b=0,c=0,d=0; char *p=argv[1];
-        while(*p>='0'&&*p<='9') a=a*10+(*p++)-'0'; if(*p) p++;
-        while(*p>='0'&&*p<='9') b=b*10+(*p++)-'0'; if(*p) p++;
-        while(*p>='0'&&*p<='9') c=c*10+(*p++)-'0'; if(*p) p++;
-        while(*p>='0'&&*p<='9') d=d*10+(*p++)-'0';
+        while(*p >= '0' && *p <= '9') {
+            a = a * 10 + (*p++) - '0';
+        }
+        if(*p) {
+            p++;
+        }
+        while(*p >= '0' && *p <= '9') {
+            b = b * 10 + (*p++) - '0';
+        }
+        if(*p) {
+            p++;
+        }
+        while(*p >= '0' && *p <= '9') {
+            c = c * 10 + (*p++) - '0';
+        }
+        if(*p) {
+            p++;
+        }
+        while(*p >= '0' && *p <= '9') {
+            d = d * 10 + (*p++) - '0';
+        }
         ip=MAKE_IP(a,b,c,d);
     } else {
         kprintf("Resolvendo %s...\n",argv[1]);

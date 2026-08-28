@@ -5,6 +5,7 @@
 #include <fs/vfs.h>
 #include <mm/kmalloc.h>
 
+
 extern void kprintf(const char*,...);
 extern void ksnprintf(char*,u32,const char*,...);
 extern int  shell_run_net_cmd(const char*,int,char**);
@@ -123,7 +124,10 @@ static void cmd_mem(void){
     kprintf("Heap usado: %u KB\n",kmem_used()/1024);
 }
 static void cmd_reboot(void){
-    __asm__ volatile("outb $0xFE,$0x64");
+    __asm__ volatile(
+        "outb %%al, $0x64"
+        : : "a"(0xFE)
+    );
 }
 static void cmd_halt(void){
     kprintf("Desligando...\n");

@@ -1,3 +1,4 @@
+
 /* linker.ld — StarOS x86 32-bit */
 ENTRY(_start)
 OUTPUT_FORMAT(elf32-i386)
@@ -5,8 +6,7 @@ OUTPUT_FORMAT(elf32-i386)
 SECTIONS {
     . = 1M;
 
-    .text ALIGN(4K) : {
-        *(.multiboot2)
+    .text ALIGN(4) : {
         *(.text)
     }
 
@@ -26,5 +26,6 @@ SECTIONS {
     /DISCARD/ : {
         *(.comment)
         *(.eh_frame)
+        *(.note.GNU-stack)
     }
 }
