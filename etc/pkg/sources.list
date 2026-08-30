@@ -1,0 +1,3 @@
+# StarOS Package Sources
+deb http://pkg.staros.dev stable main
+deb http://pkg.staros.dev stable contrib
