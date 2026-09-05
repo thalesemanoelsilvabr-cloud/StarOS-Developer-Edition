@@ -11,9 +11,10 @@ void fb_init(u32* buf, u32 w, u32 h, u32 pitch){
     fb_buf=buf; fb_w=w; fb_h=h; fb_pitch=pitch/4;
 }
 static inline void fb_pixel(int x,int y,u32 c){
-    if((u32)x<fb_w&&(u32)y<fb_h) fb_buf[y*fb_pitch+x]=c;
+    if(fb_buf&&(u32)x<fb_w&&(u32)y<fb_h) fb_buf[y*fb_pitch+x]=c;
 }
 void fb_clear(u32 c){
+    if(!fb_buf) return;
     u32 total=fb_h*fb_pitch;
     for(u32 i=0;i<total;i++) fb_buf[i]=c;
 }

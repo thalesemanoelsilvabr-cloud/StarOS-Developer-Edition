@@ -42,7 +42,7 @@ extern void ksnprintf(char*,u32,const char*,...);
 extern void browser_main(void);
 extern int  deb_install(const char *path);
 extern void deb_installer_app_main(void);
-extern u32  timer_ticks;
+extern u32 volatile timer_ticks;
 
 /* ── Callback de progresso para o shell ──────────────────────── */
 static void shell_pkg_progress(const char *pkg, int pct){

@@ -1,7 +1,15 @@
 # StarOS Beta Edition — Makefile
+# Usa o cross compiler i686-elf quando disponivel; senao cai para o gcc
+# do host em modo 32-bit (precisa de gcc-multilib).
+CROSS   := $(shell command -v i686-elf-gcc 2>/dev/null)
+ifeq ($(CROSS),)
+CC      := gcc
+LD      := ld
+else
 CC      := i686-elf-gcc
-AS      := nasm
 LD      := i686-elf-ld
+endif
+AS      := nasm
 GRUB    := grub-mkrescue
 
 CFLAGS  := -m32 -std=c11 -ffreestanding \

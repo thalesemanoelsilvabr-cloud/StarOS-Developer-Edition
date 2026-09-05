@@ -1,0 +1,20 @@
+name: build
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  kernel:
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v4
+      - name: Instala dependencias
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y nasm gcc-multilib grub-pc-bin grub-common xorriso mtools
+      - name: Compila o kernel
+        run: make
+      - name: Gera a ISO
+        run: make iso

@@ -135,9 +135,11 @@ int vfs_mkdir(const char* path){
 
 int vfs_mkdir_p(const char* path){
     char tmp[MAX_PATH]; int n=vstrlen(path);
+    if(n >= MAX_PATH) return -1;
     for(int i=1;i<=n;i++){
         if(path[i]=='/'||path[i]==0){
-            for(int j=0;j<i;j++) tmp[j]=path[j]; tmp[i]=0;
+            for(int j=0;j<i;j++) tmp[j]=path[j];
+            tmp[i]=0;
             if(!find_node(tmp)) alloc_node(tmp,1);
         }
     }
@@ -146,16 +148,20 @@ int vfs_mkdir_p(const char* path){
 
 int vfs_mkdir_p_for_file(const char* path){
     char tmp[MAX_PATH]; int n=vstrlen(path);
+    if(n >= MAX_PATH) return -1;
     /* encontra ultimo / */
     int last=0;
-    for(int i=0;i<n;i++) if(path[i]=='/') last=i;
+    for(int i=0;i<n;i++){
+        if(path[i]=='/') last=i;
+    }
     if(last==0) return 0;
-    for(int i=0;i<last;i++) tmp[i]=path[i]; tmp[last]=0;
+    for(int i=0;i<last;i++) tmp[i]=path[i];
+    tmp[last]=0;
     return vfs_mkdir_p(tmp);
 }
 
 int vfs_readline(vfs_file_t* f, char* buf, u32 max){
-    if(!f||!f->node||f->pos>=f->node->size) return 0;
+    if(!f||!f->node||!max||f->pos>=f->node->size) return 0;
     u32 i=0;
     while(i<max-1 && f->pos<f->node->size){
         char c=(char)f->node->data[f->pos++];

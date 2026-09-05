@@ -48,6 +48,8 @@ void gui_mb2_init(void* mb2){
     }
 }
 
+int gui_has_fb(void){ return fb_mem != (u32*)0; }
+
 int gui_poll_event(gui_event_t* e){
     /* scroll do mouse */
     extern int mouse_get_scroll(void);

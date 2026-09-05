@@ -15,7 +15,8 @@
 
 typedef struct {
     int    status;          /* 200, 301, 404 … */
-    char   headers[HTTP_MAX_HEADERS][2][HTTP_HDR_NAME_LEN];
+    char   header_names[HTTP_MAX_HEADERS][HTTP_HDR_NAME_LEN];
+    char   header_values[HTTP_MAX_HEADERS][HTTP_HDR_VAL_LEN];
     int    header_count;
     u8    *body;            /* kmalloc'd, caller deve kfree */
     u32    body_len;

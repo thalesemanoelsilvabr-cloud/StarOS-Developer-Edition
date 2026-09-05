@@ -21,7 +21,7 @@ static inline u32 htonl(u32 v){
 static inline u32 ntohl(u32 v){ return htonl(v); }
 
 /* ── IP helpers ────────────────────────────────────────────── */
-#define MAKE_IP(a,b,c,d) ((ip4_t)((a)<<24|(b)<<16|(c)<<8|(d)))
+#define MAKE_IP(a,b,c,d) ((ip4_t)(((u32)(a)<<24)|((u32)(b)<<16)|((u32)(c)<<8)|(u32)(d)))
 #define IP_BROADCAST     0xFFFFFFFFu
 
 /* ── Ethernet ──────────────────────────────────────────────── */

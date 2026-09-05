@@ -58,18 +58,31 @@ static int parse_url(const char *url, url_t *out) {
 
     out->port = 80;
     int i=0;
-    while (*p && *p!='/' && *p!=':') out->host[i++] = *p++;
+    while (*p && *p!='/' && *p!=':') {
+        if (i < (int)sizeof(out->host)-1) out->host[i++] = *p;
+        p++;
+    }
     out->host[i] = 0;
+    if (i == 0) return -1;
     if (*p==':') {
         p++;
         char pstr[8]; int pi=0;
-        while(is_digit(*p)) pstr[pi++]=*p++;
+        while(is_digit(*p)){
+            if(pi < (int)sizeof(pstr)-1) pstr[pi++]=*p;
+            p++;
+        }
         pstr[pi]=0;
         out->port=(u16)atoi_s(pstr);
+        if(!out->port) return -1;
     }
-    if (*p=='/') kstrncpy(out->path, p, HTTP_URL_MAX-1);
+    if (*p=='/') kstrncpy(out->path, p, HTTP_URL_MAX);
     else { out->path[0]='/'; out->path[1]=0; }
     return 0;
+}
+
+/* ── Concatena com limite no buffer de request ─────────────── */
+static void req_append(char *buf, u32 cap, u32 *len, const char *s){
+    while(*s && *len < cap) buf[(*len)++] = *s++;
 }
 
 /* ── Envia string pelo socket ───────────────────────────────── */
@@ -106,23 +119,22 @@ int http_get(const char *url, http_response_t *resp) {
 
     /* monta request */
     char req[1024];
-    char *w = req;
-    /* GET /path HTTP/1.1\r\n */
-    kmemcpy(w,"GET ",4); w+=4;
-    kstrcpy(w,u.path); w+=kstrlen(u.path);
-    kmemcpy(w," HTTP/1.1\r\nHost: ",17); w+=17;
-    kstrcpy(w,u.host); w+=kstrlen(u.host);
-    kmemcpy(w,"\r\nUser-Agent: StarOS/0.4 Browser\r\n"
-               "Accept: text/html\r\nConnection: close\r\n\r\n", 75);
-    w+=75;
+    u32 rlen = 0;
+    req_append(req, sizeof(req), &rlen, "GET ");
+    req_append(req, sizeof(req), &rlen, u.path);
+    req_append(req, sizeof(req), &rlen, " HTTP/1.1\r\nHost: ");
+    req_append(req, sizeof(req), &rlen, u.host);
+    req_append(req, sizeof(req), &rlen,
+               "\r\nUser-Agent: StarOS/0.4 Browser\r\n"
+               "Accept: text/html\r\nConnection: close\r\n\r\n");
 
-    sock_send(fd,(u8*)req,(u32)(w-req));
+    sock_send(fd,(u8*)req,rlen);
 
     /* recebe resposta */
     u8 *buf = (u8*)kmalloc(HTTP_BODY_MAX + 4096);
     if (!buf){ sock_close(fd); return -1; }
     u32 total = 0, cap = HTTP_BODY_MAX + 4096;
-    extern u32 timer_ticks;
+    extern u32 volatile timer_ticks;
     u32 deadline = timer_ticks + 1000;  /* 10 s */
     while (timer_ticks < deadline && total < cap-1) {
         int n = sock_recv(fd, buf+total, cap-1-total);
@@ -156,22 +168,24 @@ int http_get(const char *url, http_response_t *resp) {
         /* "Name: Value" */
         char *colon = kstrchr(hdr,':');
         if (colon && colon < end) {
+            char *name  = resp->header_names[resp->header_count];
+            char *value = resp->header_values[resp->header_count];
             int ni=0,vi=0;
             char *p2=hdr;
-            while(p2<colon&&ni<63) resp->headers[resp->header_count][0][ni++]=*p2++;
-            resp->headers[resp->header_count][0][ni]=0;
-            p2=colon+2;
-            while(p2<end&&*p2!='\r'&&vi<255) resp->headers[resp->header_count][1][vi++]=*p2++;
-            resp->headers[resp->header_count][1][vi]=0;
+            while(p2<colon&&ni<HTTP_HDR_NAME_LEN-1) name[ni++]=*p2++;
+            name[ni]=0;
+            p2=colon+1;
+            while(p2<end&&(*p2==' '||*p2=='\t')) p2++;
+            while(p2<end&&*p2!='\r'&&vi<HTTP_HDR_VAL_LEN-1) value[vi++]=*p2++;
+            value[vi]=0;
             /* verifica chunked e content-length */
-            if(str_lower_eq(resp->headers[resp->header_count][0],"transfer-encoding",17)
-               && str_lower_eq(resp->headers[resp->header_count][1],"chunked",7))
+            if(str_lower_eq(name,"transfer-encoding",17)
+               && str_lower_eq(value,"chunked",7))
                 chunked=1;
-            if(str_lower_eq(resp->headers[resp->header_count][0],"content-length",14))
-                content_len=atoi_s(resp->headers[resp->header_count][1]);
-            if(str_lower_eq(resp->headers[resp->header_count][0],"location",8)) {
-                kstrncpy(resp->redirect_url,
-                         resp->headers[resp->header_count][1], HTTP_URL_MAX-1);
+            if(str_lower_eq(name,"content-length",14))
+                content_len=atoi_s(value);
+            if(str_lower_eq(name,"location",8)) {
+                kstrncpy(resp->redirect_url, value, HTTP_URL_MAX);
             }
             if(resp->header_count<HTTP_MAX_HEADERS-1) resp->header_count++;
         }
