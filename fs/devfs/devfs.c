@@ -1,4 +1,4 @@
-/* devfs.c — /dev/* */
+/* devfs.c — nos de dispositivo em /dev */
 #include <kernel/types.h>
 extern void kprintf(const char*,...);
 void devfs_init(void){ kprintf("[devfs] /dev iniciado\n"); }

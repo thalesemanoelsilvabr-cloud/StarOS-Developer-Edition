@@ -12,6 +12,7 @@ void kstrcpy(char* d, const char* s){
 }
 
 void kstrncpy(char* d, const char* s, u32 n){
+    if(!n) return;
     u32 i = 0;
     while(i < n - 1 && s[i]){ d[i] = s[i]; i++; }
     d[i] = 0;

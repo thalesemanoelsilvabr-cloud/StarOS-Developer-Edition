@@ -7,7 +7,7 @@ void pic_init(void){
     outb(0x21,0x20);iowait(); outb(0xA1,0x28);iowait();
     outb(0x21,0x04);iowait(); outb(0xA1,0x02);iowait();
     outb(0x21,0x01);iowait(); outb(0xA1,0x01);iowait();
-    outb(0x21,0xF9); /* IRQ0+IRQ1 habilitados */
+    outb(0x21,0xF8); /* IRQ0 (timer) + IRQ1 (teclado) + IRQ2 (cascata) */
     outb(0xA1,0xEF); /* IRQ12 habilitado no slave */
 }
 void pic_eoi(u8 irq){ if(irq>=8) outb(0xA0,0x20); outb(0x20,0x20); }

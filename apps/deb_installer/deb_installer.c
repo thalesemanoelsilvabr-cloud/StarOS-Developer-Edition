@@ -318,9 +318,9 @@ static void installer_gui_close(int success){
     wgt_progressbar_set(prog_bar, success?100:0);
     window_render(prog_win);
     /* aguarda 2 s */
-    extern u32 timer_ticks;
+    extern u32 volatile timer_ticks;
     u32 dl=timer_ticks+200;
-    while(timer_ticks<dl) {}
+    while(timer_ticks<dl) __asm__ volatile("hlt");
     window_destroy(prog_win);
     prog_win=0;
 }

@@ -17,12 +17,19 @@ typedef struct blk {
 static blk_t* heap_head = NULL;
 static u32 heap_used = 0;
 
-void kmem_init(void){
-    heap_head = (blk_t*)HEAP_START;
+void kmem_init_at(u32 base, u32 size){
+    if(base < HEAP_START) base = HEAP_START;
+    base = (base + 0xFFFu) & ~0xFFFu;
+    if(size < 0x10000u) size = HEAP_SIZE;
+    heap_head = (blk_t*)base;
     heap_head->magic = MAGIC_FREE;
-    heap_head->size  = HEAP_SIZE - sizeof(blk_t);
+    heap_head->size  = size - sizeof(blk_t);
     heap_head->next  = NULL;
     heap_head->prev  = NULL;
+}
+
+void kmem_init(void){
+    kmem_init_at(HEAP_START, HEAP_SIZE);
 }
 
 void* kmalloc(u32 size){

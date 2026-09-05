@@ -6,6 +6,7 @@ extern void kprintf(const char*,...);
 
 static inline u8  inb(u16 p){u8 v;__asm__ volatile("inb %1,%0":"=a"(v):"Nd"(p));return v;}
 static inline void outb(u16 p,u8 v){__asm__ volatile("outb %0,%1"::"a"(v),"Nd"(p));}
+static inline void outw(u16 p,u16 v){__asm__ volatile("outw %0,%1"::"a"(v),"Nd"(p));}
 
 /* ── RTC (Real Time Clock via BIOS CMOS) ──────────────────── */
 static u8 cmos_read(u8 reg){
@@ -117,8 +118,9 @@ const char* battery_icon(int pct, int charging){
 /* ── Power ────────────────────────────────────────────────── */
 void acpi_power_off(void){
     /* ACPI S5 via porta 0x604 (QEMU) */
-    outb(0x604,0x0);
-    outb(0xB004,0x2000);  /* bochs/older qemu */
+    outw(0x604,0x2000);   /* qemu >= 2.0 */
+    outw(0xB004,0x2000);  /* bochs/older qemu */
+    outw(0x4004,0x3400);  /* virtualbox */
     /* fallback HLT */
     __asm__ volatile("cli; hlt");
 }

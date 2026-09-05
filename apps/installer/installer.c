@@ -277,12 +277,37 @@ static void draw_logo(void){
 static void install_do(void);
 static void rebuild_step(void);
 
+/* copia os valores digitados/selecionados da etapa atual */
+static void capture_step(void){
+    switch(step){
+    case STEP_DISK:{
+        int idx = wl_disk ? wgt_listbox_selected(wl_disk) : -1;
+        static const char* disks[] = { "/dev/sda", "/dev/nvme0", "/dev/sdb" };
+        if(idx>=0 && idx<3) kstrncpy(sel_disk, disks[idx], sizeof(sel_disk));
+        break;
+    }
+    case STEP_USER:
+        if(wi_user) kstrncpy(cfg_user, wgt_input_get(wi_user), sizeof(cfg_user));
+        if(wi_pass) kstrncpy(cfg_pass, wgt_input_get(wi_pass), sizeof(cfg_pass));
+        if(wi_host) kstrncpy(cfg_host, wgt_input_get(wi_host), sizeof(cfg_host));
+        if(wi_tz)   kstrncpy(cfg_tz,   wgt_input_get(wi_tz),   sizeof(cfg_tz));
+        break;
+    default: break;
+    }
+}
+
 static void cb_next(widget_t* w){ (void)w;
+    capture_step();
     if(step<STEP_INSTALL){ step++; rebuild_step(); }
     else install_do();
 }
 static void cb_back(widget_t* w){ (void)w;
+    capture_step();
     if(step>STEP_LANG){ step--; rebuild_step(); }
+}
+static void cb_reboot(widget_t* w){ (void)w;
+    extern void acpi_reboot(void);
+    acpi_reboot();
 }
 static void cb_lang_sel(widget_t* w){
     int idx=wgt_listbox_selected(w);
@@ -320,8 +345,8 @@ static void install_do(void){
 
     for(int s=0;install_stages[s];s++){
         wgt_label_set(wl_prog_lbl, install_stages[s]);
-        int pct=(s+1)*100/8;
-        wgt_progressbar_set(wb_prog,pct);
+        install_pct=(s+1)*100/8;
+        wgt_progressbar_set(wb_prog,install_pct);
         window_render(prog_win);
         /* simula tempo (500ms por etapa) */
         u32 dl=timer_ticks+50;
@@ -350,6 +375,13 @@ static void install_do(void){
     if(f){
         vfs_write(f,(u8*)cfg_tz,(u32)__builtin_strlen(cfg_tz));
         vfs_write(f,(u8*)"\n",1);
+        vfs_close(f);
+    }
+    f=vfs_open("/etc/fstab",VFS_O_WRITE|VFS_O_CREATE);
+    if(f){
+        char buf[96];
+        ksnprintf(buf,sizeof(buf),"%s1  /  ramfs  defaults  0 1\n",sel_disk);
+        vfs_write(f,(u8*)buf,(u32)__builtin_strlen(buf));
         vfs_close(f);
     }
     f=vfs_open("/etc/passwd",VFS_O_WRITE|VFS_O_CREATE);
@@ -393,14 +425,14 @@ static void rebuild_step(void){
         break;
     }
     case STEP_DISK:{
-        wgt_label(inst_win,20,10,"Disco de destino:");
-        wgt_label_set_color(wgt_label(inst_win,20,10,""),C_LOGO);
+        wl_sub=wgt_label(inst_win,20,10,"Disco de destino:");
+        wgt_label_set_color(wl_sub,C_LOGO);
         wl_disk=wgt_listbox(inst_win,20,50,640,200);
         wgt_listbox_add(wl_disk,"/dev/sda  (ATA)");
         wgt_listbox_add(wl_disk,"/dev/nvme0 (NVMe)");
         wgt_listbox_add(wl_disk,"/dev/sdb  (USB)");
-        wgt_label(inst_win,20,270,"AVISO: todos os dados serão apagados!");
-        wgt_label_set_color(wgt_label(inst_win,20,270,""),C_RED);
+        wgt_label_set_color(wgt_label(inst_win,20,270,
+                            "AVISO: todos os dados serão apagados!"),C_RED);
         wb_back=wgt_button(inst_win,20,390,140,28,L()->s_back,cb_back);
         wb_next=wgt_button(inst_win,540,390,140,28,L()->s_next,cb_next);
         u32 bc[]={C_ACCENT,C_WHITE,C_PANEL,C_WHITE};
@@ -413,6 +445,7 @@ static void rebuild_step(void){
         wgt_input_set(wi_user,cfg_user);
         wgt_label(inst_win,20,65,L()->s_pass);
         wi_pass=wgt_input(inst_win,20,83,400,26);
+        wgt_input_set(wi_pass,cfg_pass);
         wgt_label(inst_win,20,118,L()->s_hostname);
         wi_host=wgt_input(inst_win,20,136,400,26);
         wgt_input_set(wi_host,cfg_host);
@@ -420,7 +453,8 @@ static void rebuild_step(void){
         wi_tz=wgt_input(inst_win,20,190,400,26);
         wgt_input_set(wi_tz,cfg_tz);
         wb_back=wgt_button(inst_win,20,390,140,28,L()->s_back,cb_back);
-        wb_next=wgt_button(inst_win,540,390,140,28,L()->s_install,cb_next);
+        wb_install=wgt_button(inst_win,540,390,140,28,L()->s_install,cb_next);
+        wb_next=wb_install;
         u32 bc[]={C_ACCENT,C_WHITE,C_PANEL,C_WHITE};
         wgt_set_colors(wb_next,bc);
         break;
@@ -429,9 +463,7 @@ static void rebuild_step(void){
         fb_clear(C_BG);
         fb_draw_text(200,200,L()->s_done,C_GREEN);
         fb_draw_text(200,240,"Reinicie para usar o StarOS.",C_WHITE);
-        wgt_button(inst_win,300,350,200,36,L()->s_reboot,cb_back);
-        extern void acpi_reboot(void);
-        /* reboot ao clicar */
+        wgt_button(inst_win,300,350,200,36,L()->s_reboot,cb_reboot);
         break;
     }
     default: break;
