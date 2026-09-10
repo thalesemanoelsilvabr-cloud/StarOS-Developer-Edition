@@ -1,5 +1,5 @@
 /* ============================================================
- *  StarOS — StarPKG  (apps/pkg/pkg.c)
+ *  NovaOS — StarPKG  (apps/pkg/pkg.c)
  *  Gerenciador de pacotes com apt update/install/remove/upgrade
  * ============================================================ */
 #include <pkg/pkg.h>

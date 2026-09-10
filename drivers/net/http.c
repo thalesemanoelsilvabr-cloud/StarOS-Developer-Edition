@@ -1,5 +1,5 @@
 /* ============================================================
- *  StarOS — HTTP Client  (drivers/net/http.c)
+ *  NovaOS — HTTP Client  (drivers/net/http.c)
  *  HTTP/1.1 GET síncrono sobre a pilha TCP do StarOS
  * ============================================================ */
 #include <net/http.h>

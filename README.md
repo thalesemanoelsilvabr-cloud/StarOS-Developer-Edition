@@ -1,4 +1,4 @@
-# StarOS Developer Edition
+# NovaOS Developer Edition
 
 Sistema operacional hobby x86 32-bit com kernel proprio, GUI e rede.
 

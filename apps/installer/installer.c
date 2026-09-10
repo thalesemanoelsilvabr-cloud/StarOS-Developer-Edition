@@ -1,4 +1,4 @@
-/* installer.c — Instalador do StarOS com suporte a múltiplos idiomas */
+/* installer.c — Instalador do NovaOS com suporte a múltiplos idiomas */
 #include <kernel/types.h>
 #include <gui/framebuffer.h>
 #include <gui/window.h>

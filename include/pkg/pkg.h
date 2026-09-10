@@ -1,10 +1,10 @@
 /* ============================================================
- *  StarOS — StarPKG  (include/pkg/pkg.h)
+ *  NovaOS — NovaPKG  (include/pkg/pkg.h)
  *  Gerenciador de pacotes estilo APT para StarOS
  *  Formato de pacote: .star (equivalente ao .deb)
  * ============================================================ */
-#ifndef STAROS_PKG_H
-#define STAROS_PKG_H
+#ifndef NOVAOS_PKG_H
+#define NOVAOS_PKG_H
 
 #include <kernel/types.h>
 
