@@ -90,7 +90,7 @@ $(BUILD)/%.o: %.asm
 
 iso: $(KERNEL)
 	@mkdir -p $(ISO_DIR)/boot/grub
-	@cp $(KERNEL) $(ISO_DIR)/boot/staros.elf
+	@cp $(KERNEL) $(ISO_DIR)/boot/novaos.elf
 	@cp etc/grub/grub.cfg $(ISO_DIR)/boot/grub/grub.cfg
 	$(GRUB) -o $(ISO) $(ISO_DIR) 2>/dev/null
 	@echo "  OK ISO: $(ISO)"
