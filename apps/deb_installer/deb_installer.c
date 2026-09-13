@@ -1,5 +1,5 @@
 /* ============================================================
- *  StarOS — Instalador .deb  (apps/deb_installer/deb_installer.c)
+ *  NovaOS — Instalador .deb  (apps/deb_installer/deb_installer.c)
  *
  *  Suporta o formato Debian .deb:
  *    - ar archive contendo:

@@ -26,8 +26,8 @@ LDFLAGS := -m elf_i386 -T linker.ld --gc-sections -nostdlib
 
 BUILD   := build
 ISO_DIR := $(BUILD)/iso
-KERNEL  := $(BUILD)/staros.elf
-ISO     := $(BUILD)/staros.iso
+KERNEL  := $(BUILD)/novaos.elf
+ISO     := $(BUILD)/novaos.iso
 
 SRCS_ASM := arch/x86/boot.asm arch/x86/stubs.asm
 
@@ -66,7 +66,7 @@ OBJS     := $(OBJS_ASM) $(OBJS_C)
 .PHONY: all iso qemu qemu-net clean help
 
 all: $(KERNEL)
-	@echo "\n  OK StarOS Beta Edition compilado!"
+	@echo "\n  OK NovaOS Beta Edition compilado!"
 	@echo "  -> $(KERNEL)"
 	@echo "  -> make iso && make qemu para testar\n"
 
@@ -90,7 +90,7 @@ $(BUILD)/%.o: %.asm
 
 iso: $(KERNEL)
 	@mkdir -p $(ISO_DIR)/boot/grub
-	@cp $(KERNEL) $(ISO_DIR)/boot/staros.elf
+	@cp $(KERNEL) $(ISO_DIR)/boot/novaos.elf
 	@cp etc/grub/grub.cfg $(ISO_DIR)/boot/grub/grub.cfg
 	$(GRUB) -o $(ISO) $(ISO_DIR) 2>/dev/null
 	@echo "  OK ISO: $(ISO)"

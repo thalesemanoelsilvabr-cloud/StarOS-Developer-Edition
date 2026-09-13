@@ -1,5 +1,5 @@
 /* ============================================================
- *  StarOS — Comandos de rede/pkg para o shell  
+ *  NovaOS — Comandos de rede/pkg para o shell  
  *  (apps/shell/shell_net_cmds.c)
  *
  *  Inclua este arquivo no shell.c existente via:
@@ -177,7 +177,7 @@ static int cmd_wget(int argc, char **argv){
 static int cmd_pkg(int argc, char **argv){
     pkg_set_progress_cb(shell_pkg_progress);
     if(argc<2){
-        kprintf("StarPKG — gerenciador de pacotes StarOS\n");
+        kprintf("NovaPKG — gerenciador de pacotes NovaOS\n");
         kprintf("  pkg update               Atualiza listas\n");
         kprintf("  pkg install <nome>       Instala pacote\n");
         kprintf("  pkg remove  <nome>       Remove pacote\n");

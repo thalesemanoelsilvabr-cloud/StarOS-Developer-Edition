@@ -1,4 +1,4 @@
-; StarOS boot.asm — Multiboot2 para GRUB
+; NovaOS boot.asm — Multiboot2 para GRUB
 ; nasm -f elf32 boot.asm -o boot.o
 
 BITS 32

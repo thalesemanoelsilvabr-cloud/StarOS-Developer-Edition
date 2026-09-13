@@ -1,6 +1,6 @@
 /* ============================================================
- *  StarOS — StarBrowser  (apps/browser/browser.c)
- *  Navegador web com GUI usando o sistema gráfico do StarOS
+ *  NovaOS — NovaBrowser  (apps/browser/browser.c)
+ *  Navegador web com GUI usando o sistema gráfico do NovaOS
  *
  *  Paleta oficial StarOS:
  *    GUI_BLACK   #04020F  fundo desktop

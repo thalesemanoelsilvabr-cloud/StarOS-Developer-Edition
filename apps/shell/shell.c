@@ -1,4 +1,4 @@
-/* shell.c — StarShell simples e estavel */
+/* shell.c — NovaShell simples e estavel */
 #include <kernel/types.h>
 #include <drivers/terminal.h>
 #include <drivers/keyboard.h>
