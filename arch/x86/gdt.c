@@ -1,4 +1,3 @@
-/* gdt.c */
 #include <kernel/types.h>
 
 typedef struct {
@@ -33,9 +32,9 @@ void gdt_init(void){
     gdtp.lim  = (u16)(sizeof(gdt) - 1);
     gdtp.base = (u32)&gdt;
     set(0, 0, 0,       0,    0   );   /* null */
-    set(1, 0, 0xFFFFF, 0x9A, 0xCF);  /* kernel code */
-    set(2, 0, 0xFFFFF, 0x92, 0xCF);  /* kernel data */
-    set(3, 0, 0xFFFFF, 0xFA, 0xCF);  /* user code   */
-    set(4, 0, 0xFFFFF, 0xF2, 0xCF);  /* user data   */
+    set(1, 0, 0xFFFFF, 0x9A, 0xC0);  /* kernel code */
+    set(2, 0, 0xFFFFF, 0x92, 0xC0);  /* kernel data */
+    set(3, 0, 0xFFFFF, 0xFA, 0xC0);  /* user code   */
+    set(4, 0, 0xFFFFF, 0xF2, 0xC0);  /* user data   */
     gdt_flush((u32)&gdtp);
 }
